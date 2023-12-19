@@ -73,19 +73,20 @@ size_t get_bucket_idx(const std::string &s) {
     printf("mask before jokers: %u", mask);
     print_hand(mask);
 
-    // get rightmost bit
+    // get rightmost set bit
     temp = mask;
     temp = temp | (temp >> 1);
     temp = temp | (temp >> 2);
     temp = temp | (temp >> 4);
+    temp |= 1; // for 0
     temp -= (temp >> 1);
 
-    mask ^= temp; // unset bit
+    mask &= ~temp; // unset bit
     mask |= temp << count[0]; // add number of jokers
 
     // handle duplicate two
     mask |= (mask & 1) << (((count[0] | count[0] >> 1 | count[0] >> 2) & 1) << 1); // move the duplicate two (if it exists) to regular two
-    mask &= (0xFF & ~((count[0] | count[0] >> 1 | count[0] >> 2) & 1)); // unset the duplicate two if joker count > 0
+    mask &= ~((count[0] | count[0] >> 1 | count[0] >> 2) & 1); // unset the duplicate two if joker count > 0
 
     printf("mask after jokers: %u", mask);
     print_hand(mask);
